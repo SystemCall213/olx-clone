@@ -1,17 +1,17 @@
 <script>
     import { page } from '$app/stores';
-    import { formatDate, theme } from '../../../stores/stores'
+    import { formatDate, theme, user } from '../../../stores/stores'
     import { onMount } from 'svelte';
     import Icon from 'svelte-icons-pack/Icon.svelte'
     import AiOutlineHeart from "svelte-icons-pack/ai/AiOutlineHeart"
     import AiFillHeart from "svelte-icons-pack/ai/AiFillHeart";
     const category = $page.params.cat_name;
 
-    let posts = []; // Initialize with an empty array
+    let posts = []
 
     async function getPosts() {
         try {
-            const response = await fetch(`http://localhost:5000/posts/${category}`);
+            const response = await fetch(`http://localhost:5000/posts/${category}/${$user.uid}`);
             return await response.json();
         } catch (error) {
             console.error(error.message);

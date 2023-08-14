@@ -70,9 +70,9 @@ app.post('/add_post', upload.array('images'), async (req, res) => {
         const fileIds = await Promise.all(filePromises);
 
         // Create a new post
-        const { post_title, category, post_description, price, location, contact_person, email, phone_number } = req.body;
-        const insertQuery = 'INSERT INTO post (post_title, category, post_description, price, location, contact_person, email, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING post_id';
-        const insertValues = [post_title, category, post_description, price, location, contact_person, email, phone_number];
+        const { post_title, contact_person_id, category, post_description, price, location, contact_person, email, phone_number } = req.body;
+        const insertQuery = 'INSERT INTO post (post_title, contact_person_id, category, post_description, price, location, contact_person, email, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING post_id';
+        const insertValues = [post_title, contact_person_id, category, post_description, price, location, contact_person, email, phone_number];
         const insertResult = await pool.query(insertQuery, insertValues);
         const postId = insertResult.rows[0].post_id;
 
@@ -86,6 +86,18 @@ app.post('/add_post', upload.array('images'), async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
+// create chat
+
+app.post('/create_chat', async (req, res) => {
+    try {
+        const { message, contact_person_id, uid } = req.body
+        const chat = await pool.query("INSERT INTO chat (history, contact_person_id, user_id) VALUES($1, $2, $3) RETURNING *", [[message], contact_person_id, uid])
+        res.json(chat.rows[0])
+    } catch (error) {
+        console.error(error.message)
     }
 })
 
@@ -127,10 +139,10 @@ app.get('/post/:post_id', async (req, res) => {
 
 // get all posts of specific category
 
-app.get('/posts/:category', async (req, res) => {
+app.get('/posts/:category/:uid', async (req, res) => {
     try {
-        const { category } = req.params
-        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1", [category])
+        const { category, uid } = req.params
+        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1 AND NOT contact_person_id = $2", [category, uid])
         const posts = cat_posts.rows;
         for (const post of posts) {
             const imageQuery = 'SELECT filepath FROM files f INNER JOIN post_files pf ON f.file_id = pf.file_id WHERE pf.post_id = $1';
@@ -151,6 +163,39 @@ app.get('/image/:filename', (req, res) => {
     const imagePath = path.join(__dirname, '../', 'images', filename);
     res.sendFile(imagePath);
 });
+
+// get chat
+
+app.get('/chat/:user_id/:contact_person_id', async (req, res) => {
+    const { user_id, contact_person_id } = req.params
+    const chat = await pool.query("SELECT chat_id, history FROM chat WHERE user_id = $1 AND contact_person_id = $2", [user_id, contact_person_id])
+    if (chat.rows.length > 0) {
+        res.json(chat.rows[0])
+    } else {
+        res.json([])
+    }
+})
+
+// get chats of specific user
+
+app.get('/chats/:user_id', async (req, res) => {
+    const { user_id } = req.params
+    const chats = await pool.query("SELECT * FROM chat WHERE user_id = $1 OR contact_person_id = $1", [user_id])
+    if (chats.rows.length > 0) {
+        res.json(chats.rows)
+    } else {
+        res.json('no chats')
+    }
+})
+
+// update chat
+
+app.put('/update_history/:chat_id', async (req, res) => {
+    const { chat_id } = req.params
+    const { history } = req.body
+    const updated_chat = await pool.query("UPDATE chat SET history = $1 WHERE chat_id = $2", [history, chat_id])
+    res.json(updated_chat)
+})
 
 app.listen(5000, () => {
     console.log('server has started on port 5000')

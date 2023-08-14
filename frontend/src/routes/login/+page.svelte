@@ -39,7 +39,7 @@
                 username: jsonData.username,
                 password: jsonData.password
             });
-            // window.location.href = 'http://localhost:5173'
+            window.location.href = 'http://localhost:5173'
         } catch (error) {
             console.log(error.message)
         }

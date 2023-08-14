@@ -1,5 +1,5 @@
 <script>
-    import { theme, categories } from '../../stores/stores'
+    import { theme, categories, user } from '../../stores/stores'
     import Button from './Button.svelte'
     import InputPhoto from './input_photo.svelte';
     import Icon from 'svelte-icons-pack/Icon.svelte'
@@ -78,8 +78,10 @@
     async function addPost() {
         if (post_title && categoryPicked.src !== '' && image_assets[0] !== null && post_description.length > 40 && location && contact_person && price_valid) {
             try {
+                console.log($user.uid)
                 const formData = new FormData();
                 formData.append('post_title', post_title);
+                formData.append('contact_person_id', $user.uid)
                 formData.append('category', categoryPicked.title);
                 formData.append('post_description', post_description);
                 formData.append('price', price);
@@ -109,7 +111,7 @@
             }
         } else {
             console.log('Missing or invalid data for creating a post');
-        }
+        } 
     }
 
 

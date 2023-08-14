@@ -21,8 +21,14 @@ export default {
         'sm': '432px',
         'xs':'300px'
       },
+      height: {
+        '656': '656px'
+      },
       minWidth: {
         '112': '112px'
+      },
+      maxHeight: {
+        '320': '320px'
       },
       fontSize: {
         '4xl': '2.3rem'
