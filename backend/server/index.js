@@ -142,7 +142,12 @@ app.get('/post/:post_id', async (req, res) => {
 app.get('/posts/:category/:uid', async (req, res) => {
     try {
         const { category, uid } = req.params
-        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1 AND NOT contact_person_id = $2", [category, uid])
+        const page = parseInt(req.query.page) || 1
+        const offset = (page - 1) * 10
+        const countQuery = 'SELECT COUNT(*) FROM post WHERE category = $1 AND NOT contact_person_id = $2';
+        const countResult = await pool.query(countQuery, [category, uid]);
+        const totalCount = parseInt(countResult.rows[0].count);
+        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1 AND NOT contact_person_id = $2 LIMIT 10 OFFSET $3", [category, uid, offset])
         const posts = cat_posts.rows;
         for (const post of posts) {
             const imageQuery = 'SELECT filepath FROM files f INNER JOIN post_files pf ON f.file_id = pf.file_id WHERE pf.post_id = $1';
@@ -150,7 +155,7 @@ app.get('/posts/:category/:uid', async (req, res) => {
             post.imageUrls = imageResult.rows.map(row => row.filepath);
         }
 
-        res.json(posts);
+        res.json({posts, totalCount});
     } catch (error) {
         console.error(error.message)
     }
@@ -187,6 +192,46 @@ app.get('/chats/:user_id', async (req, res) => {
         res.json('no chats')
     }
 })
+
+// get posts by search term
+
+app.get('/search/:searchTerm', async (req, res) => {
+    try {
+        const { searchTerm } = req.params
+        const page = parseInt(req.query.page) || 1
+        const offset = (page - 1) * 10
+        const countQuery = "SELECT COUNT(*) FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%'";
+        const countResult = await pool.query(countQuery, [searchTerm]);
+        const totalCount = parseInt(countResult.rows[0].count);
+        const search_posts = await pool.query("SELECT * FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%' LIMIT 10 OFFSET $2", [searchTerm, offset])
+        const posts = search_posts.rows
+
+        for (const post of posts) {
+            const imageQuery = 'SELECT filepath FROM files f INNER JOIN post_files pf ON f.file_id = pf.file_id WHERE pf.post_id = $1';
+            const imageResult = await pool.query(imageQuery, [post.post_id]);
+            post.imageUrls = imageResult.rows.map(row => row.filepath);
+        }
+
+        res.json({posts, totalCount});
+    } catch (error) {
+        console.log(error.message)
+    }
+})
+
+// get usernames of users the client have a chat with
+
+app.get('/users', async (req, res) => {
+    try {
+        const userIds = req.query.userIds.split(',').map(id => parseInt(id));
+        const queryString = 'SELECT userName FROM olx_user WHERE uid = ANY($1::integer[])'
+        const users = await pool.query(queryString, [userIds])
+
+        res.json(users.rows)
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'An error occurred' })
+    }
+});
 
 // update chat
 

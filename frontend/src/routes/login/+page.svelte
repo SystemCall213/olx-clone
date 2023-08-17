@@ -1,5 +1,5 @@
 <script>
-    import { user } from '../../stores/stores'
+    import { user, theme } from '../../stores/stores'
     let login = true
     let username = ''
     let password = ''
@@ -49,64 +49,64 @@
 <div class="w-full h-full flex justify-center">
     <div class="flex flex-col rounded-lg border-2 border-primaryColor p-4 w-48 md:w-96 mt-40">
         <div class="flex flex-row mb-5">
-            <button type='button' on:click={handleLogin} class={`border-b border-primaryColor text-2xl w-1/2 pb-2 ${login && 'font-bold border-b-2'}`}>
+            <button type='button' on:click={handleLogin} class={`border-b text-2xl w-1/2 pb-2 ${login && 'font-bold border-b-2'} transition duration-300 ease-in ${$theme ? 'text-white border-white' : 'bg-white border-primaryColor'}`}>
                 Log in
             </button>
-            <button type='button' on:click={handleLogin} class={`border-b border-primaryColor text-2xl w-1/2 pb-2 ${!login && 'font-bold border-b-2'}`}>
+            <button type='button' on:click={handleLogin} class={`border-b text-2xl w-1/2 pb-2 ${!login && 'font-bold border-b-2'} transition duration-300 ease-in ${$theme ? 'text-white border-white' : 'bg-white border-primaryColor'}`}>
                 Sign up
             </button>
         </div>
         {#if login}
-            <div class="text-gray-500 ml-1 mb-1">Username</div>
+            <div class={`ml-1 mb-1 ${$theme ? 'text-white' : 'text-gray-500'}`}>Username</div>
             <input 
                 type="text" 
-                class="outline-none border border-gray-300 p-1 rounded-md bg-gray-100"
+                class={`outline-none border p-1 rounded-md ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100'}`}
                 placeholder="Enter username"
                 value={username}
                 on:input={(e) => username = e.target.value}
             />
-            <div class="text-gray-500 ml-1 mb-1 mt-5 ">Password</div>
+            <div class={`ml-1 mb-1 mt-5 ${$theme ? 'text-white' : 'text-gray-500'}`}>Password</div>
             <input 
                 type="password" 
-                class="outline-none border border-gray-300 p-1 rounded-md bg-gray-100"
+                class={`outline-none border p-1 rounded-md ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100'}`}
                 placeholder="Enter password"
                 value={password}
                 on:input={(e) => password = e.target.value}
             />
             <div class="flex flex-row justify-between mt-4">
                 <div></div>
-                <button type="button" on:click={logIn} class="text-primaryColor font-semibold px-2 border-2 border-primaryColor p-1 rounded-lg">
+                <button type="button" on:click={logIn} class={`font-semibold px-2 border-2 p-1 rounded-lg ${$theme ? 'border-white text-white' : 'text-primaryColor border-primaryColor'}`}>
                     Log In
                 </button>
             </div>
         {:else} 
-            <div class="text-gray-500 ml-1 mb-1">Username</div>
+            <div class={`ml-1 mb-1 ${$theme ? 'text-white' : 'text-gray-500'}`}>Username</div>
             <input 
                 type="text" 
-                class="outline-none border border-gray-300 p-1 rounded-md bg-gray-100"
+                class={`outline-none border p-1 rounded-md ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100'}`}
                 placeholder="Enter username"
                 value={username}
                 on:input={(e) => username = e.target.value}
             />
-            <div class="text-gray-500 ml-1 mb-1 mt-5 ">Password</div>
+            <div class={`ml-1 mb-1 mt-5 ${$theme ? 'text-white' : 'text-gray-500'}`}>Password</div>
             <input 
                 type="password" 
-                class="outline-none border border-gray-300 p-1 rounded-md bg-gray-100"
+                class={`outline-none border p-1 rounded-md ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100'}`}
                 placeholder="Enter password"
                 value={password}
                 on:input={(e) => password = e.target.value}
             />
-            <div class="text-gray-500 ml-1 mb-1 mt-5 ">Confirm password</div>
+            <div class={`ml-1 mb-1 mt-5 ${$theme ? 'text-white' : 'text-gray-500'}`}>Confirm password</div>
             <input 
                 type="password" 
-                class="outline-none border border-gray-300 p-1 rounded-md bg-gray-100"
+                class={`outline-none border p-1 rounded-md ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100'}`}
                 placeholder="Confirm password"
                 value={confirmPassword}
                 on:input={(e) => confirmPassword = e.target.value}
             />
             <div class="flex flex-row justify-between mt-4">
                 <div></div>
-                <button type="button" on:click={signUp} class="text-primaryColor font-semibold px-2 border-2 border-primaryColor p-1 rounded-lg">
+                <button type="button" on:click={signUp} class={`font-semibold px-2 border-2 p-1 rounded-lg ${$theme ? 'border-white text-white' : 'text-primaryColor border-primaryColor'}`}>
                     Sign Up
                 </button>
             </div>

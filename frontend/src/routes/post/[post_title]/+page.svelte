@@ -109,7 +109,7 @@
 
 {#if post.post_id}
     <div class={`relative flex flex-col gap-8 p-2 w-full ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100 '}`}>
-        <div class={`relative rounded-md p-4 w-full ${$theme ? 'bg-darkTheme_light_gray' : 'bg-gray-300 '}`}>
+        <div class={`relative rounded-md p-4 w-full xl:w-1/2 ${$theme ? 'bg-darkTheme_light_gray' : 'bg-gray-300 '}`}>
             <img 
                 src={`http://localhost:5000/image/${encodeURIComponent(post.imageUrls[image_counter])}`} 
                 alt=""

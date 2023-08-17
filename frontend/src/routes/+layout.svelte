@@ -4,10 +4,12 @@
     import "../app.css"
     import Icon from 'svelte-icons-pack/Icon.svelte'
     import FaSolidUserCircle from "svelte-icons-pack/fa/FaSolidUserCircle"
-    import BsCaretDown from "svelte-icons-pack/bs/BsCaretDown";
+    import BsCaretDown from "svelte-icons-pack/bs/BsCaretDown"
     let currentTheme
     let caretDown = false
     let userMenuHovered = false
+    let lastScrollTop = 0
+    let hideToolbar = false
 
     const handleLogIn = () => {
         window.location.href = 'http://localhost:5173/login';
@@ -49,11 +51,25 @@
             opacity: 0;
         }
     }
+
+    .toolbar-hidden {
+        top: -72px;
+    }
 </style>
 
-<div class={`w-full h-screen overflow-auto flex flex-col items-center transition duration-500 ease-in-out ${currentTheme && 'bg-darkTheme_dark_blue'}`}>
-    <div class='sticky top-0 w-full bg-primaryColor p-2 flex justify-center z-10'>
-        <div class={`flex flex-row w-sm md:w-md lg:w-lg xl:w-xlg 2xl:w-2xl items-center justify-between`}>
+<div id='main' on:scroll={() => {
+
+    const scrollTopPosition = document.getElementById('main').scrollTop
+    if (scrollTopPosition > lastScrollTop) {
+        hideToolbar = true
+    } else if (scrollTopPosition < lastScrollTop) {
+        hideToolbar = false
+    }
+    lastScrollTop = scrollTopPosition <= 0 ? 0 : scrollTopPosition;
+}
+} class={`w-full h-screen overflow-auto flex flex-col items-center transition duration-500 ease-in-out ${currentTheme && 'bg-darkTheme_dark_blue'}`}>
+    <div class={`fixed top-0 w-full bg-primaryColor p-2 flex justify-center transition-all duration-500 ease-in-out z-1000 ${hideToolbar && 'toolbar-hidden'}`}>
+        <div class={`relative flex flex-row w-sm md:w-md lg:w-lg xl:w-xlg 2xl:w-2xl items-center justify-between z-100`}>
             <a href='/' class='text-3xl p-1 text-white font-bold'>OLX</a>
             <div class={`flex flex-row items-center`}>
                 <div class={`rounded-full flex w-20 h-8 bg-darkTheme_dark_blue mr-10 p-1 transition-color duration-500 ease-in ${!currentTheme && 'bg-white'}`}>
@@ -84,23 +100,24 @@
                         {/if}
                     </button>
                     {#if caretDown}
-                        <div role="button" tabindex="0" class="absolute flex flex-col rounded-lg bg-white w-full"
+                        <div role="button" tabindex="0" class={`absolute flex flex-col rounded-lg w-full ${$theme ? 'bg-darkTheme_blue text-white' : 'bg-white'}`}
                             on:mouseenter={() => userMenuHovered = true} on:mouseleave={() => {userMenuHovered = false; caretDown = false}}
                         >
-                            <button
-                                type="button"
-                                on:click={() => {
-                                    user.set({})
-                                }}
-                                class={`p-2 text-lg w-full flex items-start`}
-                            >
-                                Log out
-                            </button>
                             <a href={`/your-chats`}
                                 class={`p-2 text-lg w-full flex items-start`}
                             >
                                 Your chats
                             </a>
+                            <button
+                                type="button"
+                                on:click={() => {
+                                    user.set({})
+                                    window.location.href = 'http://localhost:5173'
+                                }}
+                                class={`p-2 text-lg w-full flex items-start`}
+                            >
+                                Log out
+                            </button>
                         </div>
                     {/if}
                 </div>

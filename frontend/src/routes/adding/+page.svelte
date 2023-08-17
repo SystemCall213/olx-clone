@@ -1,10 +1,10 @@
 <script>
     import { theme, categories, user } from '../../stores/stores'
     import Button from './Button.svelte'
-    import InputPhoto from './input_photo.svelte';
+    import InputPhoto from './input_photo.svelte'
     import Icon from 'svelte-icons-pack/Icon.svelte'
-    import AiFillCaretDown from "svelte-icons-pack/ai/AiFillCaretDown";
-    import { onMount } from 'svelte';
+    import AiFillCaretDown from "svelte-icons-pack/ai/AiFillCaretDown"
+    import { onMount } from 'svelte'
 
     let post_title_input_blurred = false
     let location_blurred = false
@@ -76,9 +76,8 @@
     }
 
     async function addPost() {
-        if (post_title && categoryPicked.src !== '' && image_assets[0] !== null && post_description.length > 40 && location && contact_person && price_valid) {
+        if ($user.username && post_title && categoryPicked.src !== '' && image_assets[0] !== null && post_description.length > 40 && location && contact_person && price_valid) {
             try {
-                console.log($user.uid)
                 const formData = new FormData();
                 formData.append('post_title', post_title);
                 formData.append('contact_person_id', $user.uid)
@@ -90,7 +89,6 @@
                 formData.append('email', email);
                 formData.append('phone_number', phone_number);
 
-                // Append image files to the FormData
                 for (const image of image_assets) {
                     formData.append('images', image);
                 }
@@ -121,6 +119,22 @@
     div {
         transition: color 0.5s;
         transition-timing-function: ease-out;
+    }
+
+    .blinking {
+        animation: blink-animation 3s infinite;
+    }
+
+    @keyframes blink-animation {
+        0%, 50% {
+            background-color: white;
+        }
+        25%, 75% {
+            background-color: #002f34;
+        }
+        100% {
+            background-color: white;
+        }
     }
 </style>
 
@@ -157,15 +171,14 @@
             Category
         </div>
         {#if categoryPicked.src !== ''}
-                <div class={`relative w-full sm:w-3/5 lg:w-1/3 rounded-md mt-2 p-2 flex flex-row justify-between items-center gap-4`}>
-                    <div class="absolute rounded-md top-0 left-0 w-full h-full" style={`background-color: ${categoryPicked.bg_color}; opacity: 0.5;`}></div>
+                <div class={`w-full sm:w-3/5 lg:w-1/3 rounded-md mt-2 p-2 flex flex-row justify-between items-center gap-4`} style={`background-color: ${categoryPicked.bg_color}80;`}>
                     <div class={`flex flex-row justify-between items-center gap-4`}>
-                        <img src={categoryPicked.src} alt={categoryPicked.title} class="w-12 h-12 rounded-full z-10" >
-                        <div class="z-10">
+                        <img src={categoryPicked.src} alt={categoryPicked.title} class="w-12 h-12 rounded-full" >
+                        <div>
                             {categoryPicked.title}
                         </div>
                     </div>
-                    <button on:click={() => pickingCategory = true} class="z-10 underline hover:font-semibold">Change</button>
+                    <button on:click={() => pickingCategory = true} class="underline hover:font-semibold">Change</button>
                 </div>
         {:else}
             <button type="button" on:click={() => pickingCategory = true} class={`p-2 w-3/12 flex flex-row justify-between rounded-md mt-2 outline-none ${$theme ? 'bg-darkTheme_light' : 'bg-gray-100'}`}>
@@ -317,7 +330,6 @@
                         categoryPicked.title = category.title,
                         categoryPicked.bg_color = category.bg_color
                         pickingCategory = false
-                        console.log('hlo')
                     }} 
                     class={`relative w-full sm:w-3/5 lg:w-1/3 rounded-md p-2 flex flex-row items-center gap-4`}
                 >
@@ -330,4 +342,10 @@
             {/each}
         </div>
     </div>
+{/if}
+
+{#if !$user.username}
+    <a href='/login' class='fixed top-1/2 left-1/2 bg-white p-6 font-bold rounded-md -translate-y-12 -translate-x-16 blinking'>
+        Log in to post
+    </a>
 {/if}
