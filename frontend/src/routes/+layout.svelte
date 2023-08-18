@@ -1,4 +1,5 @@
 <script>
+    export const prerender = true
     import { user } from '../stores/stores'
     import { theme } from '../stores/stores'
     import "../app.css"
