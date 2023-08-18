@@ -250,7 +250,6 @@ app.put('/add_liked/:post_id', async(req, res) => {
     try {
         const { post_id } = req.params
         const { uid } = req.body
-        console.log(post_id, uid)
         const updateUser = `
                 UPDATE olx_user
                 SET liked_posts = array_append(liked_posts, $1)
