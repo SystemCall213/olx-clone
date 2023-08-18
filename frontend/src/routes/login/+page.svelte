@@ -16,7 +16,7 @@
         if (password === confirmPassword) {
             try {
                 const body = { username, password }
-                const response = await fetch("http://localhost:5000/olx", {
+                const response = await fetch("https://olx-clone-backend-two.vercel.app/olx", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify(body)
@@ -31,7 +31,7 @@
 
     async function logIn() {
         try {
-            const response = await fetch(`http://localhost:5000/olx/${username}/${password}`)
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/olx/${username}/${password}`)
             const jsonData = await response.json()
             console.log(jsonData.liked_posts)
             user.set({
@@ -40,7 +40,7 @@
                 password: jsonData.password,
                 liked_posts: jsonData.liked_posts ? jsonData.liked_posts : []
             });
-            window.location.href = 'http://localhost:5173'
+            window.location.href = 'https://olx-clone-backend-two.vercel.app'
         } catch (error) {
             console.log(error.message)
         }

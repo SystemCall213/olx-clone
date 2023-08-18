@@ -93,7 +93,7 @@
                     formData.append('images', image);
                 }
 
-                const response = await fetch("http://localhost:5000/add_post", {
+                const response = await fetch("https://olx-clone-backend-two.vercel.app/add_post", {
                     method: "POST",
                     body: formData,
                 });
@@ -111,8 +111,6 @@
             console.log('Missing or invalid data for creating a post');
         } 
     }
-
-
 </script>
 
 <style>

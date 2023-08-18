@@ -22,7 +22,7 @@
 
     async function getPosts() {
         try {
-            const response = await fetch(`http://localhost:5000/posts/${category}/${$user.uid}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/posts/${category}/${$user.uid}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
             return await response.json()
         } catch (error) {
             console.error(error.message)
@@ -32,7 +32,7 @@
 
     async function getSearchedPosts() {
         try {
-            const response = await fetch(`http://localhost:5000/search/${searchTerm}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/search/${searchTerm}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
             return await response.json()
         } catch (error) {
             console.error(error.message)
@@ -48,7 +48,7 @@
 
     async function fetchClient() {
         try {
-            const response = await fetch(`http://localhost:5000/olx/${$user.username}/${$user.password}`)
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/olx/${$user.username}/${$user.password}`)
             client = await response.json()
         } catch (error) {
             console.log(error.message)
@@ -79,7 +79,7 @@
         try {
             const uid = $user.uid
             const body = { uid }
-            const response = await fetch(`http://localhost:5000/add_liked/${post_id}`, {
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/add_liked/${post_id}`, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)
@@ -95,7 +95,7 @@
         try {
             const uid = $user.uid
             const body = { uid }
-            const response = await fetch(`http://localhost:5000/remove_liked/${post_id}`, {
+            const response = await fetch(`https://olx-clone-backend-two.vercel.app/remove_liked/${post_id}`, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(body)
