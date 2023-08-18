@@ -4,7 +4,7 @@
 </script>
 
 <div class="w-full h-screen">
-    <div class={`w-full text-primaryColor font-bold text-3xl flex p-3 my-10 justify-center transition duration-500 ease-in-out ${$theme && 'text-white'}`}>
+    <div class={`w-full text-primaryColor font-bold text-3xl flex p-3 my-20 justify-center transition duration-500 ease-in-out ${$theme && 'text-white'}`}>
         Main categories
     </div>
     <div class="w-full flex flex-row gap-2 sm:gap-5 md:gap-10 overflow-x-auto md:overflow-visible md:flex-wrap">

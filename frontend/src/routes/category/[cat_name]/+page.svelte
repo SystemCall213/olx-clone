@@ -18,10 +18,11 @@
     let max_price = undefined
     let searchTerm = ''
     let currentPage = 1
+    let client = {}
 
     async function getPosts() {
         try {
-            const response = await fetch(`http://localhost:5000/posts/${category}/${$user.uid}?page=${currentPage}`)
+            const response = await fetch(`http://localhost:5000/posts/${category}/${$user.uid}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
             return await response.json()
         } catch (error) {
             console.error(error.message)
@@ -31,7 +32,7 @@
 
     async function getSearchedPosts() {
         try {
-            const response = await fetch(`http://localhost:5000/search/${searchTerm}?page=${currentPage}`)
+            const response = await fetch(`http://localhost:5000/search/${searchTerm}?page=${currentPage}&min_price=${(min_price !== undefined) ? min_price : 0}&max_price=${(max_price !== undefined) ? max_price : 1000000}`)
             return await response.json()
         } catch (error) {
             console.error(error.message)
@@ -45,7 +46,17 @@
         return cleanedString
     }
 
+    async function fetchClient() {
+        try {
+            const response = await fetch(`http://localhost:5000/olx/${$user.username}/${$user.password}`)
+            client = await response.json()
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
     onMount(async () => {
+        fetchClient()
         const { posts: fetchedPosts, totalCount: fetchedTotalCount } = await getPosts();
         posts = fetchedPosts;
         totalPosts = fetchedTotalCount;
@@ -61,6 +72,38 @@
             const { posts: fetchedPosts, totalCount: fetchedTotalCount } = await getPosts();
             posts = fetchedPosts;
             totalPosts = fetchedTotalCount;
+        }
+    }
+
+    async function LikePost(post_id) {
+        try {
+            const uid = $user.uid
+            const body = { uid }
+            const response = await fetch(`http://localhost:5000/add_liked/${post_id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            })
+            fetchClient()
+            Search()
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    async function UnlikePost(post_id) {
+        try {
+            const uid = $user.uid
+            const body = { uid }
+            const response = await fetch(`http://localhost:5000/remove_liked/${post_id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            })
+            fetchClient()
+            Search()
+        } catch (error) {
+            console.log(error.message)
         }
     }
 </script>
@@ -112,38 +155,60 @@
         <div class='flex flex-col w-1/5'>
             <div>Price</div>
             <div class="flex flex-row gap-3">
-                <input type="text" bind:value={min_price} placeholder="Min" on:input={() => {if (!min_price) min_price = undefined}} class={`p-2 mt-2 w-14 outline-none ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
-                <input type="text" bind:value={max_price} placeholder="Max" on:input={() => {if (!max_price) max_price = undefined}} class={`p-2 mt-2 w-14 outline-none ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
+                <input 
+                    type="text" 
+                    bind:value={min_price} 
+                    placeholder="Min" 
+                    on:blur={() => {
+                        if (min_price !== undefined) {
+                            Search()
+                        } else if (!min_price) min_price = undefined
+                    }} 
+                    class={`p-2 mt-2 w-14 outline-none ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
+                <input 
+                    type="text" 
+                    bind:value={max_price} 
+                    placeholder="Max" 
+                    on:blur={() => {
+                        if (max_price !== undefined) {
+                            Search()
+                        } else if (!max_price) max_price = undefined
+                    }} 
+                    class={`p-2 mt-2 w-14 outline-none ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
             </div>
         </div>
     </div>
     <div class='text-3xl font-bold my-4 mx-2'>We found {totalPosts} posts</div>
     {#each posts as post}
-        {#if ((min_price !== undefined || min_price) ? post.price >= min_price : true) && ((max_price !== undefined || max_price) ? post.price <= max_price : true)}
-            <a href={`/post/${post.post_id}?${generateUrl(post.post_title)}`} class={`w-full flex flex-row justify-between ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
-                <div class='p-2 w-full flex flex-row'>
-                    <img 
-                        src={`http://localhost:5000/image/${encodeURIComponent(post.imageUrls[0])}`} 
-                        alt='post-img'
-                        class='h-40 w-56'
-                    >
-                    <div class='flex flex-col justify-between ml-3'>
-                        <div>
-                            {post.post_title}
-                        </div>
-                        <div>
-                            {post.location} - added {formatDate(post.created_at)}
-                        </div>
-                    </div>
-                </div>
-                <div class='flex flex-col justify-between items-end p-2'>
-                    <div>{post.price}$</div>
+        <a href={`/post/${post.post_id}?${generateUrl(post.post_title)}`} class={`w-full flex flex-row justify-between ${$theme ? 'bg-darkTheme_light_gray' : 'bg-white'}`}>
+            <div class='p-2 w-full flex flex-row'>
+                <img 
+                    src={`http://localhost:5000/image/${encodeURIComponent(post.imageUrls[0])}`} 
+                    alt='post-img'
+                    class='h-40 w-56'
+                >
+                <div class='flex flex-col justify-between ml-3'>
                     <div>
-                        <Icon src={AiOutlineHeart} size=24 />
+                        {post.post_title}
+                    </div>
+                    <div>
+                        {post.location} - added {formatDate(post.created_at)}
                     </div>
                 </div>
-            </a>
-        {/if}
+            </div>
+            <div class='flex flex-col justify-between items-end p-2'>
+                <div>{post.price}$</div>
+                {#if client.liked_posts.includes(post.post_id)}
+                    <button on:click={(e) => {e.stopPropagation(); e.preventDefault(); UnlikePost(post.post_id, true)}}>
+                        <Icon src={AiFillHeart} size=24 color="red" />
+                    </button>
+                {:else}
+                    <button on:click={(e) => {e.stopPropagation(); e.preventDefault(); LikePost(post.post_id, true)}}>
+                        <Icon src={AiOutlineHeart} size=24 />
+                    </button>
+                {/if}
+            </div>
+        </a>
     {/each}
     <div class={`flex flex-row gap-2 mt-3 w-full justify-center ${$theme && 'text-white'}`}>
         <button type='button' on:click={async () => {

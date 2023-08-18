@@ -100,7 +100,7 @@
                         {/if}
                     </button>
                     {#if caretDown}
-                        <div role="button" tabindex="0" class={`absolute flex flex-col rounded-lg w-full ${$theme ? 'bg-darkTheme_blue text-white' : 'bg-white'}`}
+                        <div role="button" tabindex="0" class={`absolute flex flex-col rounded-lg w-full ${$theme ? 'bg-darkTheme_light_gray text-white' : 'bg-white'}`}
                             on:mouseenter={() => userMenuHovered = true} on:mouseleave={() => {userMenuHovered = false; caretDown = false}}
                         >
                             <a href={`/your-chats`}

@@ -138,7 +138,7 @@
     }
 </style>
 
-<div class={`w-full overflow-auto p-3 ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-300'}`}>
+<div class={`w-full overflow-auto mt-8 p-3 ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-300'}`}>
     <div class={`text-4xl font-bold p-1 py-8 ${$theme ? 'text-white' : 'text-darkTheme_dark_blue'} `}>
         Add post
     </div>

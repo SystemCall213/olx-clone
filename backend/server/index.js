@@ -106,7 +106,7 @@ app.post('/create_chat', async (req, res) => {
 app.get('/olx/:username/:password', async (req, res) => {
     try {
         const { username, password } = req.params
-        const user = await pool.query("SELECT uid, userName, password FROM olx_user WHERE userName = $1 AND password = $2", [username, password])
+        const user = await pool.query("SELECT * FROM olx_user WHERE userName = $1 AND password = $2", [username, password])
         res.json(user.rows[0])
     } catch (error) {
         console.log(error.message)
@@ -144,10 +144,12 @@ app.get('/posts/:category/:uid', async (req, res) => {
         const { category, uid } = req.params
         const page = parseInt(req.query.page) || 1
         const offset = (page - 1) * 10
-        const countQuery = 'SELECT COUNT(*) FROM post WHERE category = $1 AND NOT contact_person_id = $2';
-        const countResult = await pool.query(countQuery, [category, uid]);
+        const min_price = parseInt(req.query.min_price)
+        const max_price = parseInt(req.query.max_price)
+        const countQuery = 'SELECT COUNT(*) FROM post WHERE category = $1 AND NOT contact_person_id = $2 AND price > $3 AND price < $4';
+        const countResult = await pool.query(countQuery, [category, uid, min_price, max_price]);
         const totalCount = parseInt(countResult.rows[0].count);
-        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1 AND NOT contact_person_id = $2 LIMIT 10 OFFSET $3", [category, uid, offset])
+        const cat_posts = await pool.query("SELECT * FROM post WHERE category = $1 AND price > $4 AND price < $5 AND NOT contact_person_id = $2 LIMIT 10 OFFSET $3", [category, uid, offset, min_price, max_price])
         const posts = cat_posts.rows;
         for (const post of posts) {
             const imageQuery = 'SELECT filepath FROM files f INNER JOIN post_files pf ON f.file_id = pf.file_id WHERE pf.post_id = $1';
@@ -200,10 +202,12 @@ app.get('/search/:searchTerm', async (req, res) => {
         const { searchTerm } = req.params
         const page = parseInt(req.query.page) || 1
         const offset = (page - 1) * 10
-        const countQuery = "SELECT COUNT(*) FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%'";
-        const countResult = await pool.query(countQuery, [searchTerm]);
+        const min_price = parseInt(req.query.min_price)
+        const max_price = parseInt(req.query.max_price)
+        const countQuery = "SELECT COUNT(*) FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%' AND price > $2 AND price < $3";
+        const countResult = await pool.query(countQuery, [searchTerm, min_price, max_price]);
         const totalCount = parseInt(countResult.rows[0].count);
-        const search_posts = await pool.query("SELECT * FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%' LIMIT 10 OFFSET $2", [searchTerm, offset])
+        const search_posts = await pool.query("SELECT * FROM post WHERE LOWER(post_title) LIKE '%' || LOWER($1) || '%' AND price > $3 AND price < $4 LIMIT 10 OFFSET $2", [searchTerm, offset, min_price, max_price])
         const posts = search_posts.rows
 
         for (const post of posts) {
@@ -241,6 +245,42 @@ app.put('/update_history/:chat_id', async (req, res) => {
     const updated_chat = await pool.query("UPDATE chat SET history = $1 WHERE chat_id = $2", [history, chat_id])
     res.json(updated_chat)
 })
+
+app.put('/add_liked/:post_id', async(req, res) => {
+    try {
+        const { post_id } = req.params
+        const { uid } = req.body
+        console.log(post_id, uid)
+        const updateUser = `
+                UPDATE olx_user
+                SET liked_posts = array_append(liked_posts, $1)
+                WHERE uid = $2;
+            `;
+        await pool.query(updateUser, [post_id, uid]);
+        res.json(updateUser)
+    } catch (error) {
+        console.error(error.message)
+    }
+})
+
+app.put('/remove_liked/:post_id', async (req, res) => {
+    const { post_id } = req.params;
+    const { uid } = req.body;
+
+    const updateUser = `
+        UPDATE olx_user
+        SET liked_posts = array_remove(liked_posts, $1)
+        WHERE uid = $2;
+    `;
+
+    try {
+        await pool.query(updateUser, [post_id, uid]);
+        res.json({ message: 'Post removed from liked_posts array' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
 
 app.listen(5000, () => {
     console.log('server has started on port 5000')

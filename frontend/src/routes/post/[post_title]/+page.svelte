@@ -1,13 +1,14 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/stores'
     import { theme, formatDate, user } from '../../../stores/stores'
-    import Button from '../../adding/Button.svelte';
-    import { onMount } from 'svelte';
+    import Button from '../../adding/Button.svelte'
+    import { onMount } from 'svelte'
     import Icon from 'svelte-icons-pack/Icon.svelte'
     import AiOutlineHeart from "svelte-icons-pack/ai/AiOutlineHeart"
-    import BsTelephone from "svelte-icons-pack/bs/BsTelephone";
-    import BsCaretLeft from "svelte-icons-pack/bs/BsCaretLeft";
-    import BsCaretRight from "svelte-icons-pack/bs/BsCaretRight";
+    import AiFillHeart from "svelte-icons-pack/ai/AiFillHeart"
+    import BsTelephone from "svelte-icons-pack/bs/BsTelephone"
+    import BsCaretLeft from "svelte-icons-pack/bs/BsCaretLeft"
+    import BsCaretRight from "svelte-icons-pack/bs/BsCaretRight"
     const post_id = $page.params.post_title
     let post = {}
     let image_counter = 0
@@ -19,6 +20,7 @@
     let message = ''
     let chat
     $: chatAlreadyExists = chat !== undefined && chat.length !== 0 ? true : false
+    let client = {}
 
     async function getPost() {
         try {
@@ -31,6 +33,7 @@
     }
 
     onMount(async () => {
+        fetchClient()
         post = await getPost();
         for (let i = 0; i < post.imageUrls.length; i++) {
             image_pointers.push(i)
@@ -98,6 +101,45 @@
             post_chat.scrollTop = post_chat.scrollHeight
         }
     }
+
+    async function fetchClient() {
+        try {
+            const response = await fetch(`http://localhost:5000/olx/${$user.username}/${$user.password}`)
+            client = await response.json()
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    async function LikePost(post_id) {
+        try {
+            const uid = $user.uid
+            const body = { uid }
+            const response = await fetch(`http://localhost:5000/add_liked/${post_id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            })
+            fetchClient()
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    async function UnlikePost(post_id) {
+        try {
+            const uid = $user.uid
+            const body = { uid }
+            const response = await fetch(`http://localhost:5000/remove_liked/${post_id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            })
+            fetchClient()
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
 </script>
 
 <style>
@@ -108,7 +150,7 @@
 </style>
 
 {#if post.post_id}
-    <div class={`relative flex flex-col gap-8 p-2 w-full ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100 '}`}>
+    <div class={`flex flex-col gap-8 p-2 mt-20 w-full ${$theme ? 'bg-darkTheme_blue' : 'bg-gray-100 '}`}>
         <div class={`relative rounded-md p-4 w-full xl:w-1/2 ${$theme ? 'bg-darkTheme_light_gray' : 'bg-gray-300 '}`}>
             <img 
                 src={`http://localhost:5000/image/${encodeURIComponent(post.imageUrls[image_counter])}`} 
@@ -132,9 +174,17 @@
                 <div class='text-xs text-gray-700'>
                     Added {formatDate(post.created_at)}
                 </div>
-                <div>
-                    <Icon src={AiOutlineHeart} size=24 />
-                </div>
+                {#if client.liked_posts}
+                    {#if client.liked_posts.includes(post.post_id)}
+                        <button on:click={(e) => {e.stopPropagation(); e.preventDefault(); UnlikePost(post.post_id)}}>
+                            <Icon src={AiFillHeart} size=24 color="red" />
+                        </button>
+                    {:else}
+                        <button on:click={(e) => {e.stopPropagation(); e.preventDefault(); LikePost(post.post_id)}}>
+                            <Icon src={AiOutlineHeart} size=24 />
+                        </button>
+                    {/if}
+                {/if}
             </div>
             <div class='mt-4 text-2xl'>
                 {post.post_title}

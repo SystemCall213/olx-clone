@@ -3,7 +3,8 @@ CREATE DATABASE olx_clone;
 CREATE TABLE olx_user (
     uid SERIAL PRIMARY KEY,
     userName VARCHAR(20),
-    password VARCHAR(30)
+    password VARCHAR(30),
+    liked_posts INT[]
 );
 
 -- CREATE TABLE user_chats (

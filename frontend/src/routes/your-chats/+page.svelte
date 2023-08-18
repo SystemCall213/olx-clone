@@ -89,7 +89,7 @@
     }
 </style>
 
-<div class={`${$theme ? 'bg-darkTheme_blue' : 'bg-gray-300'} flex flex-row gap-2 p-3 w-full mt-8 h-656`}>
+<div class={`${$theme ? 'bg-darkTheme_blue' : 'bg-gray-300'} flex flex-row gap-2 p-3 w-full mt-16 h-656`}>
     <div class={`flex flex-col rounded-lg p-2 ${$theme ? 'bg-darkTheme_light_gray' : 'bg-gray-200'} w-2/5 gap-3`}>
         <div class={`${$theme ? 'bg-darkTheme_light' : 'bg-white'} p-1 rounded-lg flex justify-center text-xl`}>
             Your chats

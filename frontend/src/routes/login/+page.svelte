@@ -33,11 +33,12 @@
         try {
             const response = await fetch(`http://localhost:5000/olx/${username}/${password}`)
             const jsonData = await response.json()
-            console.log(jsonData)
+            console.log(jsonData.liked_posts)
             user.set({
                 uid: jsonData.uid,
                 username: jsonData.username,
-                password: jsonData.password
+                password: jsonData.password,
+                liked_posts: jsonData.liked_posts ? jsonData.liked_posts : []
             });
             window.location.href = 'http://localhost:5173'
         } catch (error) {
