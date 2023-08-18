@@ -40,7 +40,7 @@
                 password: jsonData.password,
                 liked_posts: jsonData.liked_posts ? jsonData.liked_posts : []
             });
-            window.location.href = 'https://olx-clone-backend-two.vercel.app'
+            window.location.href = 'https://olx-clone-three.vercel.app'
         } catch (error) {
             console.log(error.message)
         }

@@ -13,7 +13,7 @@
     let hideToolbar = false
 
     const handleLogIn = () => {
-        window.location.href = 'https://olx-clone-backend-two.vercel.app/login';
+        window.location.href = 'https://olx-clone-three.vercel.app/login';
     }
 
     theme.subscribe((value) => {
