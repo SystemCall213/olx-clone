@@ -3,7 +3,7 @@ const Pool = require('pg').Pool
 const pool = new Pool({
     user: 'postgres',
     password: 'gfhkfvtynd11',
-    host: 'olx-clone-backend-two.vercel.app',
+    host: 'localhost',
     port: 5432,
     database: 'olx_clone'
 })
