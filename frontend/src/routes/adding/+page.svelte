@@ -95,6 +95,9 @@
 
                 const response = await fetch("https://olx-clone-backend-two.vercel.app/add_post", {
                     method: "POST",
+                    headers: {
+                        "Origin": "https://olx-clone-three.vercel.app", 
+                    },
                     body: formData,
                 });
 
