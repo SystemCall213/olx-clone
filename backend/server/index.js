@@ -4,42 +4,42 @@ const cors = require('cors')
 const pool = require('./db')
 const multer = require('multer');
 const path = require('path');
-
+const { Dropbox } = require('dropbox');
 //middleware
 app.use(cors())
 app.use(express.json())
-app.use('/images', express.static(path.join(__dirname, '../', 'images')));
+
+const dbx = new Dropbox({ accessToken: 'sl.Bkbv6acbJrvb9qbUq7s1NN04tWXcjEEp906CItYvoAC7B3hRvAyWW8DexoEv480-zf-iSdscIiWoDcXvZbsewUZEfLVTsps787J-vaUeE78nZp0d-M8gYcTJSdX_M3jv1Kaoa6ij7fHc' });
 
 //ROUTES//
 
 // upload a photo to backend 
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, '../images'); // Specify the upload directory
-    },
-    filename: (req, file, cb) => {
-        const filename = `${Date.now()}_${file.originalname}`;
-        cb(null, filename);
-    },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
   // Route to handle file uploads
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
-        const filePath = req.file.path; // The path where the file was saved
+        console.log(dbx)
+        console.log('aa')
+        const fileData = req.file.buffer;
+        const fileName = req.file.originalname;
+
+        // Upload the file to Dropbox
+        const uploadResponse = await dbx.filesUpload({
+            path: '/' + fileName,
+            contents: fileData,
+        });
 
         // Insert file information into your PostgreSQL database
         const query = 'INSERT INTO files (filename, filepath) VALUES ($1, $2) RETURNING *';
-        const values = [req.file.originalname, filePath];
+        const values = [req.file.originalname, fileName];
         const result = await pool.query(query, values);
 
         res.json(result.rows[0]);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error(error.message);
     }
 });
 
@@ -59,10 +59,30 @@ app.post('/olx', async (req, res) => {
 
 app.post('/add_post', upload.array('images'), async (req, res) => {
     try {
+        console.log(dbx)
+        console.log('aaa')
         // Save file information in the `files` table
         const filePromises = req.files.map(async file => {
-            const query = 'INSERT INTO files (filename, filepath) VALUES ($1, $2) RETURNING file_id';
-            const values = [file.originalname, file.path];
+
+            const fileData = file.buffer;
+            const fileName = file.originalname;
+
+            // Upload the file to Dropbox
+            const uploadResponse = await dbx.filesUpload({
+                path: '/' + fileName,
+                contents: fileData,
+            });
+
+            const sharedLinkSettings = {
+                path: uploadResponse.path_display,
+            };
+
+            const sharedLinkResponse = await dbx.sharingCreateSharedLinkWithSettings(sharedLinkSettings);
+            const fileLink = sharedLinkResponse.result.url;
+    
+            // Insert file information into your PostgreSQL database
+            const query = 'INSERT INTO files (filename, filepath, dropbox_link) VALUES ($1, $2, $3) RETURNING file_id';
+            const values = [file.originalname, fileName, fileLink];
             const result = await pool.query(query, values);
             return result.rows[0].file_id;
         });
@@ -84,8 +104,8 @@ app.post('/add_post', upload.array('images'), async (req, res) => {
 
         res.json({ message: 'Post created successfully' });
     } catch (error) {
+        console.log('aaaa')
         console.error(error.message);
-        res.status(500).json({ error: 'Internal server error' });
     }
 })
 

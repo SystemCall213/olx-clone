@@ -23,7 +23,8 @@ CREATE TABLE chat (
 CREATE TABLE files (
     file_id SERIAL PRIMARY KEY,
     filename VARCHAR(255),
-    filepath VARCHAR(255)
+    filepath VARCHAR(255),
+    dropbox_link VARCHAR(255)
 );
 
 CREATE TABLE post_files (
