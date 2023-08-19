@@ -21,8 +21,6 @@ const upload = multer({ storage });
   // Route to handle file uploads
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
-        console.log(dbx)
-        console.log('aa')
         const fileData = req.file.buffer;
         const fileName = req.file.originalname;
 
