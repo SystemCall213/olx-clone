@@ -8,7 +8,7 @@ const { Dropbox } = require('dropbox');
 //middleware
 const allowedOrigins = ['https://olx-clone-three.vercel.app'];
 app.use(cors({
-    origin: 'https://olx-clone-three.vercel.app'
+    origin: "*"
 })
 )
 app.use(express.json())
