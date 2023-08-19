@@ -6,7 +6,10 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/"
+            "dest": "/",
+            "headers": [
+                { "key": "Access-Control-Allow-Origin", "value": "https://olx-clone-three.vercel.app" }
+            ]
         }
     ]
 }
