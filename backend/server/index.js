@@ -16,6 +16,10 @@ app.use(cors({
         }
     }
 }));
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    next()
+})
 app.use(express.json())
 
 const dbx = new Dropbox({ accessToken: 'sl.Bkbv6acbJrvb9qbUq7s1NN04tWXcjEEp906CItYvoAC7B3hRvAyWW8DexoEv480-zf-iSdscIiWoDcXvZbsewUZEfLVTsps787J-vaUeE78nZp0d-M8gYcTJSdX_M3jv1Kaoa6ij7fHc' });
