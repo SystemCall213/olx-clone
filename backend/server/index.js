@@ -6,7 +6,16 @@ const multer = require('multer');
 const path = require('path');
 const { Dropbox } = require('dropbox');
 //middleware
-app.use(cors())
+const allowedOrigins = ['https://olx-clone-three.vercel.app'];
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
 app.use(express.json())
 
 const dbx = new Dropbox({ accessToken: 'sl.Bkbv6acbJrvb9qbUq7s1NN04tWXcjEEp906CItYvoAC7B3hRvAyWW8DexoEv480-zf-iSdscIiWoDcXvZbsewUZEfLVTsps787J-vaUeE78nZp0d-M8gYcTJSdX_M3jv1Kaoa6ij7fHc' });
