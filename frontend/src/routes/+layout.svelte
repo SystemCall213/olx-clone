@@ -113,7 +113,7 @@
                                 type="button"
                                 on:click={() => {
                                     user.set({})
-                                    window.location.href = 'http://localhost:5173'
+                                    window.location.href = 'https://olx-clone-three.vercel.app'
                                 }}
                                 class={`p-2 text-lg w-full flex items-start`}
                             >
