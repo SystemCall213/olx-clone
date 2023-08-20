@@ -60,6 +60,7 @@
         const { posts: fetchedPosts, totalCount: fetchedTotalCount } = await getPosts();
         posts = fetchedPosts;
         totalPosts = fetchedTotalCount;
+        console.log(posts)
     })
 
     async function Search() {

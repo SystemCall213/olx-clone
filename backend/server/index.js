@@ -60,34 +60,33 @@ app.post('/olx', async (req, res) => {
 app.post('/add_post', upload.array('images'), async (req, res) => {
     try {
         console.log(dbx)
-        console.log('aaa')
-        // Save file information in the `files` table
-        const filePromises = req.files.map(async file => {
+        // // Save file information in the `files` table
+        // const filePromises = req.files.map(async file => {
 
-            const fileData = file.buffer;
-            const fileName = file.originalname;
+        //     const fileData = file.buffer;
+        //     const fileName = file.originalname;
 
-            // Upload the file to Dropbox
-            const uploadResponse = await dbx.filesUpload({
-                path: '/' + fileName,
-                contents: fileData,
-            });
+        //     // Upload the file to Dropbox
+        //     const uploadResponse = await dbx.filesUpload({
+        //         path: '/' + fileName,
+        //         contents: fileData,
+        //     });
 
-            const sharedLinkSettings = {
-                path: uploadResponse.path_display,
-            };
+        //     const sharedLinkSettings = {
+        //         path: uploadResponse.path_display,
+        //     };
 
-            const sharedLinkResponse = await dbx.sharingCreateSharedLinkWithSettings(sharedLinkSettings);
-            const fileLink = sharedLinkResponse.result.url;
+        //     const sharedLinkResponse = await dbx.sharingCreateSharedLinkWithSettings(sharedLinkSettings);
+        //     const fileLink = sharedLinkResponse.result.url;
     
-            // Insert file information into your PostgreSQL database
-            const query = 'INSERT INTO files (filename, filepath, dropbox_link) VALUES ($1, $2, $3) RETURNING file_id';
-            const values = [file.originalname, fileName, fileLink];
-            const result = await pool.query(query, values);
-            return result.rows[0].file_id;
-        });
+        //     // Insert file information into your PostgreSQL database
+        //     const query = 'INSERT INTO files (filename, filepath, dropbox_link) VALUES ($1, $2, $3) RETURNING file_id';
+        //     const values = [file.originalname, fileName, fileLink];
+        //     const result = await pool.query(query, values);
+        //     return result.rows[0].file_id;
+        // });
         
-        const fileIds = await Promise.all(filePromises);
+        // const fileIds = await Promise.all(filePromises);
 
         // Create a new post
         const { post_title, contact_person_id, category, post_description, price, location, contact_person, email, phone_number } = req.body;
@@ -97,10 +96,10 @@ app.post('/add_post', upload.array('images'), async (req, res) => {
         const postId = insertResult.rows[0].post_id;
 
         // Establish relationships between post and files in the junction table
-        const postFilesQuery = 'INSERT INTO post_files (post_id, file_id) VALUES ($1, $2)';
-        for (const fileId of fileIds) {
-            await pool.query(postFilesQuery, [postId, fileId]);
-        }
+        // const postFilesQuery = 'INSERT INTO post_files (post_id, file_id) VALUES ($1, $2)';
+        // for (const fileId of fileIds) {
+        //     await pool.query(postFilesQuery, [postId, fileId]);
+        // }
 
         res.json({ message: 'Post created successfully' });
     } catch (error) {

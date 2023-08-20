@@ -76,7 +76,7 @@
     }
 
     async function addPost() {
-        if ($user.username && post_title && categoryPicked.src !== '' && image_assets[0] !== null && post_description.length > 40 && location && contact_person && price_valid) {
+        if ($user.username && post_title && categoryPicked.src !== '' && post_description.length > 40 && location && contact_person && price_valid) {
             try {
                 const formData = new FormData();
                 formData.append('post_title', post_title);
@@ -89,9 +89,9 @@
                 formData.append('email', email);
                 formData.append('phone_number', phone_number);
 
-                for (const image of image_assets) {
-                    formData.append('images', image);
-                }
+                // for (const image of image_assets) {
+                //     formData.append('images', image);
+                // }
 
                 const response = await fetch("https://olx-clone-backend-two.vercel.app/add_post", {
                     method: "POST",
