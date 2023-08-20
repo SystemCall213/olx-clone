@@ -8,13 +8,5 @@
             "src": "/(.*)",
             "use": "@vercel/node"
         }
-    ],
-    "headers": [
-        { 
-            "source": "/(.*)",
-            "headers": [
-                { "key": "Access-Control-Allow-Origin", "value": "https://olx-clone-three.vercel.app" }
-            ]
-        }
     ]
 }
