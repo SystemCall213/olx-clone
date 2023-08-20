@@ -5,7 +5,7 @@ const pool = require('./db')
 const multer = require('multer');
 const path = require('path');
 const { Dropbox } = require('dropbox');
-//middleware
+//middleware, cors
 app.use(cors({
     origin: 'https://olx-clone-three.vercel.app'
 }))
